@@ -23,13 +23,8 @@ def create_sample_image(filename: str, text: str, color: str = "skyblue"):
     img = Image.new('RGB', (400, 300), color=color)
     draw = ImageDraw.Draw(img)
     
-    # Add text
-    try:
-        # Try to use a default font
-        from PIL import ImageFont
-        font = ImageFont.load_default()
-    except:
-        font = None
+    # Add text using default font
+    font = ImageFont.load_default()
     
     # Draw text in center
     text_bbox = draw.textbbox((0, 0), text, font=font)

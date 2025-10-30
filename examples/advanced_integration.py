@@ -27,7 +27,14 @@ class ImageEditingService:
         output_dir: str = "edited_images",
         cache_dir: str = ".cache"
     ):
-        """Initialize the image editing service."""
+        """
+        Initialize the image editing service.
+        
+        Args:
+            device: Device to use for processing ('cuda', 'cpu', or 'auto')
+            output_dir: Directory to save edited images
+            cache_dir: Directory for caching and history
+        """
         self.editor = ImageEditor(device=device)
         self.output_dir = Path(output_dir)
         self.cache_dir = Path(cache_dir)
@@ -111,6 +118,7 @@ class ImageEditingService:
     def batch_edit(
         self,
         image_prompts: Dict[str, str],
+        progress_callback=None,
         **common_kwargs
     ) -> Dict[str, str]:
         """
@@ -118,6 +126,7 @@ class ImageEditingService:
         
         Args:
             image_prompts: Dictionary mapping image paths to prompts
+            progress_callback: Optional callback function(current, total, image_path)
             **common_kwargs: Common parameters for all edits
             
         Returns:
@@ -127,7 +136,10 @@ class ImageEditingService:
         total = len(image_prompts)
         
         for i, (image_path, prompt) in enumerate(image_prompts.items(), 1):
-            print(f"\n[{i}/{total}] Processing {image_path}...")
+            if progress_callback:
+                progress_callback(i, total, image_path)
+            else:
+                print(f"\n[{i}/{total}] Processing {image_path}...")
             
             try:
                 output_path = self.edit_single(
