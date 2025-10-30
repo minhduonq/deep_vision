@@ -139,17 +139,25 @@ class DeepVisionClient:
 # Sử dụng
 client = DeepVisionClient()
 
-# Upload
+# Upload ảnh gốc
 result = client.upload_image("my_photo.jpg")
 filename = result['filename']
 
-# Xử lý với nhiều hiệu ứng
-client.process_image(filename, "grayscale")
-client.process_image(filename, "blur", {"strength": 5})
-client.process_image(filename, "cartoon")
+# Xử lý ảnh - mỗi lần xử lý tạo file mới với tên "processed_<filename>"
+# Lần 1: Grayscale
+result1 = client.process_image(filename, "grayscale")
+processed_filename1 = result1['filename']  # "processed_my_photo.jpg"
 
-# Tải xuống
-client.download_image("processed_my_photo.jpg", "result.jpg")
+# Lần 2: Blur - xử lý trên ảnh gốc
+result2 = client.process_image(filename, "blur", {"strength": 5})
+processed_filename2 = result2['filename']  # "processed_my_photo.jpg" (ghi đè)
+
+# Lần 3: Cartoon - xử lý trên ảnh gốc
+result3 = client.process_image(filename, "cartoon")
+processed_filename3 = result3['filename']  # "processed_my_photo.jpg" (ghi đè)
+
+# Tải xuống ảnh cuối cùng (cartoon effect)
+client.download_image(processed_filename3, "result.jpg")
 ```
 
 ### Tích hợp với cURL
@@ -208,15 +216,46 @@ Tests completed!
 
 ### Thêm hiệu ứng mới
 
-Xem hướng dẫn chi tiết trong README.md, mục "Mở rộng".
+Để thêm hiệu ứng mới vào hệ thống, xem hướng dẫn trong README.md.
 
-### Tích hợp Deep Learning Models
+### Tích hợp Deep Learning Models nâng cao
 
-Thư viện đã sẵn sàng cho PyTorch. Bạn có thể thêm các model như:
-- Style Transfer (chuyển đổi phong cách nghệ thuật)
-- Super Resolution (tăng độ phân giải)
-- Object Detection (phát hiện đối tượng)
-- Face Enhancement (cải thiện khuôn mặt)
+Hệ thống đã sẵn sàng để tích hợp các mô hình PyTorch. Dưới đây là ví dụ về cách thêm Style Transfer:
+
+```python
+# Trong server.py, thêm function mới
+def apply_style_transfer(image, style='starry_night'):
+    """Apply neural style transfer using PyTorch"""
+    if not PYTORCH_AVAILABLE:
+        raise Exception("PyTorch required for style transfer")
+    
+    # Load pretrained model
+    model = torch.hub.load('pytorch/vision:v0.10.0', 'vgg19', pretrained=True)
+    
+    # Preprocessing
+    transform = transforms.Compose([
+        transforms.Resize(512),
+        transforms.ToTensor(),
+    ])
+    
+    # Apply style transfer (simplified example)
+    img_tensor = transform(image).unsqueeze(0)
+    # ... style transfer logic ...
+    
+    return result_image
+```
+
+Các mô hình có thể thêm:
+- **Style Transfer** - Chuyển đổi phong cách nghệ thuật (Van Gogh, Picasso, etc.)
+- **Super Resolution** - Tăng độ phân giải ảnh sử dụng ESRGAN
+- **Object Detection** - Phát hiện đối tượng với YOLO hoặc Faster R-CNN
+- **Face Enhancement** - Cải thiện khuôn mặt với GFPGAN
+- **Image Segmentation** - Phân đoạn ảnh với U-Net hoặc DeepLab
+- **Colorization** - Tô màu ảnh đen trắng tự động
+
+Tham khảo:
+- PyTorch Hub: https://pytorch.org/hub/
+- Hugging Face Models: https://huggingface.co/models
 
 ## 8. Troubleshooting
 
