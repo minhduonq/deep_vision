@@ -234,7 +234,9 @@ def process_image():
         }), 200
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        # Log the error internally but don't expose stack trace to users
+        app.logger.error(f"Error processing image: {str(e)}")
+        return jsonify({'error': 'An error occurred while processing the image'}), 500
 
 
 @app.route('/api/download/<filename>')
@@ -276,4 +278,11 @@ def get_operations():
 if __name__ == '__main__':
     print("Starting Deep Vision Image Editing Server...")
     print("Server running at http://localhost:5000")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    print("WARNING: This is a development server. Use a production WSGI server for deployment.")
+    
+    # Debug mode should be disabled in production
+    # Set debug=False and use proper logging instead
+    import os
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
