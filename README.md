@@ -19,14 +19,14 @@ Giảng viên: Lê Thanh Hà
 chạy Backend:
 ```
 cd backend
-pip install requirements.txt
+pip install -r requirements.txt
 python api/main.py
 ```
 
 chạy frontend:
 ```
 cd frontend-react
-npm instal
+npm install
 npm run dev
 ```
 
