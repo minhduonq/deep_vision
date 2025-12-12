@@ -5,6 +5,10 @@ Core configuration module
 from pydantic_settings import BaseSettings
 from typing import Optional, List
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env file explicitly
+load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -47,13 +51,19 @@ class Settings(BaseSettings):
     # GPU Settings
     CUDA_VISIBLE_DEVICES: str = "0"
     MAX_BATCH_SIZE: int = 1
-    DEVICE: str = "cuda"  # or "cpu"
+    DEVICE: str = "cpu"  # or "cuda"
     ENABLE_XFORMERS: bool = False
     
     # Model Settings
     USE_LOCAL_MODELS: bool = False
     MAX_IMAGE_SIZE: int = 2048
     DEFAULT_IMAGE_SIZE: int = 512
+
+    # Model Selection (for local models)
+    DEBLUR_MODEL: str = "nafnet"  # nafnet, swinir
+    INPAINT_MODEL: str = "lama"  # lama, mat
+    BEAUTY_MODEL: str = "gfpgan"  # gfpgan, codeformer
+    GENERATION_MODEL: str = "huggingface"  # huggingface, replicate
     
     # Processing Settings
     MAX_CONCURRENT_TASKS: int = 3
@@ -70,6 +80,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True
+        extra = "ignore"  # Ignore extra fields from .env
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

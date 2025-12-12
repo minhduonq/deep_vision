@@ -13,6 +13,21 @@ from backend.agents.orchestrator import (
     get_orchestrator
 )
 
+# Image generation & editing agents
+from backend.agents.huggingface_generation_agent import (
+    HuggingFaceGenerationAgent,
+    generation_agent
+)
+from backend.agents.qwen_edit_agent import QwenEditAgent
+from backend.agents.qwen_fast_edit_agent import (
+    QwenFastEditAgent,
+    qwen_fast_edit_agent
+)
+from backend.agents.qwen_lora_fusion_agent import (
+    QwenLoRAFusionAgent,
+    qwen_lora_fusion_agent
+)
+
 __all__ = [
     # Base classes
     "BaseAgent",
@@ -29,5 +44,14 @@ __all__ = [
     "SimpleOrchestrator",
     "ConditionalOrchestrator",
     "get_orchestrator",
+    
+    # Generation & Editing agents
+    "HuggingFaceGenerationAgent",
+    "generation_agent",
+    "QwenEditAgent",
+    "QwenFastEditAgent",
+    "qwen_fast_edit_agent",
+    "QwenLoRAFusionAgent",
+    "qwen_lora_fusion_agent",
 ]
 

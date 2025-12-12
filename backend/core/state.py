@@ -111,8 +111,8 @@ class GenerationRequest(BaseModel):
     num_images: int = Field(default=1, ge=1, le=4)
     width: int = Field(default=512, ge=256, le=1024)
     height: int = Field(default=512, ge=256, le=1024)
-    guidance_scale: float = Field(default=7.5, ge=1.0, le=20.0)
-    num_inference_steps: int = Field(default=50, ge=10, le=150)
+    guidance_scale: float = Field(default=3.5, ge=1.0, le=10.0)  # FLUX uses lower guidance
+    num_inference_steps: int = Field(default=8, ge=1, le=16)  # FLUX.1-schnell max is 16
     seed: Optional[int] = None
 
 
@@ -132,6 +132,17 @@ class TaskStatusResponse(BaseModel):
     current_agent: Optional[str] = None
     error: Optional[str] = None
     result_url: Optional[str] = None
+    
+    class Config:
+        populate_by_name = True
+        json_schema_extra = {
+            "example": {
+                "task_id": "task_abc123",
+                "status": "completed",
+                "progress": 100.0,
+                "result_url": "/static/result.png"
+            }
+        }
 
 
 class TaskResultResponse(BaseModel):

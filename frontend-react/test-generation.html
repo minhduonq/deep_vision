@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Generation API</title>
+</head>
+<body>
+    <h1>Test Generation API</h1>
+    <button onclick="testGenerate()">Test Generate</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testGenerate() {
+            const result = document.getElementById('result');
+            result.textContent = 'Sending request...';
+
+            const requestData = {
+                prompt: 'A beautiful sunset over mountains',
+                width: 512,
+                height: 512,
+                num_inference_steps: 8,
+                guidance_scale: 3.5
+            };
+
+            console.log('Request:', requestData);
+
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                result.textContent = JSON.stringify(data, null, 2);
+
+                if (response.ok) {
+                    result.textContent += '\n\nSuccess! Task ID: ' + data.task_id;
+                    
+                    // Poll status
+                    const taskId = data.task_id;
+                    pollStatus(taskId);
+                } else {
+                    result.textContent += '\n\nError: ' + response.status;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                result.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function pollStatus(taskId) {
+            const result = document.getElementById('result');
+            
+            const interval = setInterval(async () => {
+                try {
+                    const response = await fetch(`http://localhost:8000/api/v1/status/${taskId}`);
+                    const data = await response.json();
+                    
+                    result.textContent += '\n\nStatus: ' + data.status + ' (' + data.progress + '%)';
+                    
+                    if (data.status === 'completed') {
+                        clearInterval(interval);
+                        result.textContent += '\n\nCompleted! Image URL: ' + data.result_url;
+                        
+                        if (data.result_url) {
+                            const img = document.createElement('img');
+                            img.src = 'http://localhost:8000' + data.result_url;
+                            img.style.maxWidth = '500px';
+                            document.body.appendChild(img);
+                        }
+                    } else if (data.status === 'failed') {
+                        clearInterval(interval);
+                        result.textContent += '\n\nFailed: ' + data.error;
+                    }
+                } catch (error) {
+                    console.error('Poll error:', error);
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
